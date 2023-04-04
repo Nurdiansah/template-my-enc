@@ -127,8 +127,12 @@ preg_match('/Current IP Address: \[?([:.0-9a-fA-F]+)\]?/', $externalContent, $m)
 
 $externalIp = $m[1];
 
+$enableAbsen = '0';
+
 if ($externalIp == '101.255.125.18') {
   $location = 'Hayam Wuruk';
+
+  $enableAbsen = '1';
 } else {
   $location = 'Not Listed';
 }
@@ -150,42 +154,44 @@ if ($externalIp == '101.255.125.18') {
                 <h6 class="m-b-0 text-primary"><?= $shift_val; ?></h6>
               </div>
             </div>
-            <?php $attributes = array('name' => 'hr_clocking', 'id' => 'hr_clocking', 'autocomplete' => 'off', 'class' => 'm-b-1'); ?>
-            <?php $hidden = array('token' => uencode($usession['sup_user_id'])); ?>
-            <?= form_open('erp/timesheet/set_clocking', $attributes, $hidden); ?>
-            <?php if (attendance_time_checks() < 1) { ?>
-              <input type="hidden" value="clock_in" name="clock_state" id="clock_state">
-              <input type="hidden" value="" name="time_id" id="time_id">
-              <div class="row align-items-center text-center">
-                <div class="col">
-                  <h6 class="m-b-0">
-                    <button type="submit" class="btn waves-effect waves-light btn-sm btn-success"><?= lang('Attendance.dashboard_clock_in'); ?> <i class="fas fa-long-arrow-alt-right m-r-10"></i></button>
-                  </h6>
+            <?php if ($enableAbsen == '1') { ?>
+              <?php $attributes = array('name' => 'hr_clocking', 'id' => 'hr_clocking', 'autocomplete' => 'off', 'class' => 'm-b-1'); ?>
+              <?php $hidden = array('token' => uencode($usession['sup_user_id'])); ?>
+              <?= form_open('erp/timesheet/set_clocking', $attributes, $hidden); ?>
+              <?php if (attendance_time_checks() < 1) { ?>
+                <input type="hidden" value="clock_in" name="clock_state" id="clock_state">
+                <input type="hidden" value="" name="time_id" id="time_id">
+                <div class="row align-items-center text-center">
+                  <div class="col">
+                    <h6 class="m-b-0">
+                      <button type="submit" class="btn waves-effect waves-light btn-sm btn-success"><?= lang('Attendance.dashboard_clock_in'); ?> <i class="fas fa-long-arrow-alt-right m-r-10"></i></button>
+                    </h6>
+                  </div>
+                  <div class="col">
+                    <h6 class="m-b-0">
+                      <button class="btn waves-effect waves-light btn-sm btn-secondary" type="button" disabled="disabled"><?= lang('Attendance.dashboard_clock_out'); ?> <i class="fas fa-long-arrow-alt-down m-r-10"></i></button>
+                    </h6>
+                  </div>
                 </div>
-                <div class="col">
-                  <h6 class="m-b-0">
-                    <button class="btn waves-effect waves-light btn-sm btn-secondary" type="button" disabled="disabled"><?= lang('Attendance.dashboard_clock_out'); ?> <i class="fas fa-long-arrow-alt-down m-r-10"></i></button>
-                  </h6>
+              <?php } else { ?>
+                <?php $attendance_value = attendance_time_checks_value(); ?>
+                <input type="hidden" value="clock_out" name="clock_state" id="clock_state">
+                <input type="hidden" value="<?= uencode($attendance_value[0]->time_attendance_id); ?>" name="time_id" id="time_id">
+                <div class="row align-items-center text-center">
+                  <div class="col">
+                    <h6 class="m-b-0">
+                      <button type="button" disabled="disabled" class="btn waves-effect waves-light btn-sm btn-success"><?= lang('Attendance.dashboard_clock_in'); ?> <i class="fas fa-long-arrow-alt-right m-r-10"></i></button>
+                    </h6>
+                  </div>
+                  <div class="col">
+                    <h6 class="m-b-0">
+                      <button class="btn waves-effect waves-light btn-sm btn-secondary" type="submit"><?= lang('Attendance.dashboard_clock_out'); ?> <i class="fas fa-long-arrow-alt-down m-r-10"></i></button>
+                    </h6>
+                  </div>
                 </div>
-              </div>
-            <?php } else { ?>
-              <?php $attendance_value = attendance_time_checks_value(); ?>
-              <input type="hidden" value="clock_out" name="clock_state" id="clock_state">
-              <input type="hidden" value="<?= uencode($attendance_value[0]->time_attendance_id); ?>" name="time_id" id="time_id">
-              <div class="row align-items-center text-center">
-                <div class="col">
-                  <h6 class="m-b-0">
-                    <button type="button" disabled="disabled" class="btn waves-effect waves-light btn-sm btn-success"><?= lang('Attendance.dashboard_clock_in'); ?> <i class="fas fa-long-arrow-alt-right m-r-10"></i></button>
-                  </h6>
-                </div>
-                <div class="col">
-                  <h6 class="m-b-0">
-                    <button class="btn waves-effect waves-light btn-sm btn-secondary" type="submit"><?= lang('Attendance.dashboard_clock_out'); ?> <i class="fas fa-long-arrow-alt-down m-r-10"></i></button>
-                  </h6>
-                </div>
-              </div>
-            <?php } ?>
-            <?= form_close(); ?>
+              <?php } ?>
+              <?= form_close(); ?>
+            <?php }; ?>
             <h6 class="pt-badge badge-light-success"><?= $idesignations['designation_name']; ?></h6>
           </div>
           <a href="<?= site_url('erp/attendance-list'); ?>" class="btn btn-primary btn-sm btn-round"><?= lang('Attendance.dashboard_my_attendance'); ?> <i class="fas fa-long-arrow-alt-right m-r-10"></i></a>
